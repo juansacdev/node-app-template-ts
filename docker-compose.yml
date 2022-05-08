@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    env_file:
+      - .env
+    environment:
+      SOME_SECRET: some_value
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  node-app:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      SOME_SECRET: some_value
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules # no sobre escribirá esta ruta en especifico
+
+volumes:
+  db_data: {}
