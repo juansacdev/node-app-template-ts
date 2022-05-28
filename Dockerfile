@@ -3,24 +3,30 @@ FROM node:16-alpine3.11 as builder
 
 WORKDIR /usr/app
 
-COPY package*.json .
+COPY package*.json ./
 
-RUN npm install --silence
+RUN npm ci --silence
 
 COPY . .
-
-# RUN npm run migrations:run
 
 RUN npm run build
 
 # Stage 2
 FROM node:16-alpine3.11
 
-COPY package*.json ./
+WORKDIR /usr/app
 
-RUN npm install --production
+COPY --from=builder /usr/app/package.json ./package.json
+
+COPY --from=builder /usr/app/package-lock.json ./package-lock.json
 
 COPY --from=builder /usr/app/dist ./dist
+
+RUN npm ci --production
+
+RUN chown -R node:node /usr/app
+
+USER node
 
 EXPOSE 3000
 
