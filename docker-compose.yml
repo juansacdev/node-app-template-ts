@@ -11,7 +11,7 @@ services:
       - ${DB_PORT}:${DB_PORT}
     volumes:
       - db_data:/var/lib/postgresql/data
-      
+
   node-app:
     container_name: node_app
     restart: always
